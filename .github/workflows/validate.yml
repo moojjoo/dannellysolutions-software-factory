@@ -1,0 +1,14 @@
+name: validate-factory
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate reusable templates
+        run: python3 scripts/validate_templates.py
