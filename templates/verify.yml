@@ -1,0 +1,20 @@
+# Copy to <app>/.github/workflows/verify.yml and customize build/test commands.
+name: verify
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Replace these with actual application build, unit, and Playwright steps.
+      - name: Validate configuration
+        run: |
+          test -f README.md
+          echo "Replace placeholder with application-specific build/test steps before requiring this check"
+# Configure CodeQL as a separate required workflow appropriate to each app's languages.
