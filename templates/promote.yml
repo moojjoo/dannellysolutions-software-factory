@@ -1,0 +1,28 @@
+# Example only. Do not deploy without adapting artifact retrieval and verification.
+name: promote-verified-sha
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options: [test, production]
+      commit_sha:
+        description: Full immutable commit SHA previously verified in Dev and Test
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate immutable SHA syntax
+        env:
+          SHA: ${{ inputs.commit_sha }}
+        run: |
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "A full 40-character SHA is required"; exit 1; }
+          echo "Add trusted provenance validation against Dev/Test deployment records before enabling deployment."
+# No deploy job intentionally: an application must implement verified artifact promotion
+# and GitHub Environment approval gates. This template never deploys anything.
