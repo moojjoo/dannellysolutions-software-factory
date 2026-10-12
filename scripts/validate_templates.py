@@ -8,6 +8,7 @@ REQUIRED = (
     "docs/WORKFLOW.md",
     "docs/SECURITY.md",
     "docs/REPOSITORY_SETUP.md",
+    "docs/ISSUE_CLOSURE.md",
     "templates/verify.yml",
     "templates/promote.yml",
 )
@@ -24,3 +25,7 @@ assert "workflow_dispatch" in promotion
 assert "commit_sha" in promotion
 assert "deploy:" not in promotion, "Example must not deploy automatically"
 print("Factory templates validated")
+
+closure = (ROOT / "docs/ISSUE_CLOSURE.md").read_text()
+for marker in ("Dev-Completes:", "dev-acceptance-verified", "Test and Production", "read-only"):
+    assert marker in closure, f"Missing closure policy: {marker}"
