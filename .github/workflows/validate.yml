@@ -12,3 +12,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate reusable templates
         run: python3 scripts/validate_templates.py
+      - name: Test repository integration contracts
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
