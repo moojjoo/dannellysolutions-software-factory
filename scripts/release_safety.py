@@ -21,7 +21,7 @@ def risk(paths):
     if not paths or not all(isinstance(p, str) and p for p in paths):
         return "high"
     for path in paths:
-        normalized = path.lower().lstrip("./")
+        normalized = path.lower().replace("\\", "/")
         if ".." in Path(normalized).parts or any(s in normalized for s in HIGH_RISK):
             return "high"
         if not (normalized.startswith("docs/") or normalized == "readme.md"):
