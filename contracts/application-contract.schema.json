@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/moojjoo/dannellysolutions-software-factory/blob/main/contracts/application-contract.schema.json",
+  "title": "Dannelly Solutions application contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "factory_repo",
+    "application_repo",
+    "application_name",
+    "default_branch",
+    "project_name",
+    "environments",
+    "approval_label",
+    "partial_marker",
+    "final_marker",
+    "dev_workflow",
+    "test_workflow",
+    "prod_workflow",
+    "implementation_overrides"
+  ],
+  "properties": {
+    "factory_repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "application_repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "application_name": {"type": "string", "minLength": 1},
+    "default_branch": {"type": "string", "minLength": 1},
+    "project_name": {"type": "string", "minLength": 1},
+    "environments": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["dev", "test", "prod"]},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "approval_label": {"type": "string", "minLength": 1},
+    "partial_marker": {"type": "string", "minLength": 1},
+    "final_marker": {"type": "string", "minLength": 1},
+    "dev_workflow": {"type": "string", "minLength": 1},
+    "test_workflow": {"type": "string", "minLength": 1},
+    "prod_workflow": {"type": "string", "minLength": 1},
+    "implementation_overrides": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    }
+  }
+}
