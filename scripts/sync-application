@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 1 || -z "${1:-}" ]]; then
+  echo "Usage: sync-application OWNER/REPOSITORY [additional Codex instructions]" >&2
+  exit 2
+fi
+
+target="$1"
+shift
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+factory_root="$(cd -- "$script_dir/.." && pwd)"
+prompt_file="$factory_root/.github/prompts/sync-application.prompt.md"
+
+if ! command -v codex >/dev/null 2>&1; then
+  echo "sync-application: codex is not on PATH" >&2
+  exit 127
+fi
+
+if [[ ! -f "$prompt_file" ]]; then
+  echo "sync-application: missing prompt file: $prompt_file" >&2
+  exit 1
+fi
+
+repo_name="${target##*/}"
+application_root="${SYNC_APPLICATION_ROOT:-/home/moojjoo/repos/$repo_name}"
+application_config="${SYNC_APPLICATION_CONFIG:-$application_root/.factory/application-contract.yml}"
+extra_instructions="${*:-Start with a read-only audit. Do not modify files until you report the proposed changes.}"
+
+prompt="$(<"$prompt_file")
+
+Target repository: $target
+Application checkout: $application_root
+Application configuration: $application_config
+
+$extra_instructions"
+
+exec codex "$prompt"
