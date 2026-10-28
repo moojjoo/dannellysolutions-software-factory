@@ -91,7 +91,7 @@ Create a harmless feature PR. Confirm that a failing required check prevents mer
 | Reusable verification and promotion examples | Present, **not production-ready without adaptation** |
 | Automatic merging of application PRs | **Not verified**; must configure and test per repository |
 | Branch protection and required status checks | **Not verified** |
-| Dev deployment integration for RecruiterReply | **Not implemented by this repository** |
+| Dev deployment integration for RecruiterReply | Application-owned; contract and Dev-ready handoff are tracked under `contracts/applications/recruiterreply.yml` |
 | Test/Production immutable artifact promotion | **Not implemented by this repository** |
 | AWS deployment and secret provisioning | Not included; owned by each application |
 
@@ -115,7 +115,7 @@ Each application is independently deployable. The factory must never introduce c
 
 1. Verify repository auto-merge and enforce required CI checks/rulesets.
 2. Run a harmless end-to-end PR to demonstrate blocked failures and automatic green merges.
-3. Add an **application-specific** RecruiterReply integration using its existing workflows, without altering working deployments unexpectedly.
+3. Keep the application-specific RecruiterReply contract and Dev-ready handoff synchronized with this Factory repository.
 4. Implement and test verified SHA/artifact promotion gates for Test and Production.
 
 ## Ownership

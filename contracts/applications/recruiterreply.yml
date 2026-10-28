@@ -1,0 +1,19 @@
+factory_repo: moojjoo/dannellysolutions-software-factory
+application_repo: moojjoo/recruiterreply
+application_name: RecruiterReply
+default_branch: main
+project_name: RecruiterReply MVP
+environments:
+  - dev
+  - test
+  - prod
+approval_label: dev-acceptance-verified
+partial_marker: "Refs #<issue>"
+final_marker: "Dev-Completes: #<issue>"
+dev_workflow: .github/workflows/build.yml
+test_workflow: .github/workflows/promote-test.yml
+prod_workflow: .github/workflows/promote-prod.yml
+implementation_overrides:
+  deployment_model: "AWS EC2 Docker Compose with immutable ECR images"
+  application_tests: "Backend, frontend, Playwright, CodeQL and authenticated Dev smoke checks"
+  api: "ASP.NET Core API with React frontend"
