@@ -1,6 +1,7 @@
 """Cross-repository contract checks for the RecruiterReply closure integration."""
 
 import os
+from pathlib import Path
 import unittest
 from urllib.request import Request, urlopen
 
@@ -41,6 +42,20 @@ class RecruiterReplyIntegrationTests(unittest.TestCase):
         self.assertIn("workflow_dispatch:", self.prod_promotion)
         self.assertIn("environment: test", self.test_promotion)
         self.assertIn("environment: prod", self.prod_promotion)
+
+    def test_recruiterreply_factory_contract_is_present(self):
+        contract = Path(__file__).parents[1] / "contracts/applications/recruiterreply.yml"
+        content = contract.read_text()
+        for marker in (
+            "application_repo: moojjoo/recruiterreply",
+            "default_branch: main",
+            "project_name: RecruiterReply MVP",
+            "approval_label: dev-acceptance-verified",
+            "dev_workflow: .github/workflows/build.yml",
+            "test_workflow: .github/workflows/promote-test.yml",
+            "prod_workflow: .github/workflows/promote-prod.yml",
+        ):
+            self.assertIn(marker, content)
 
 
 if __name__ == "__main__":

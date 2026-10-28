@@ -13,6 +13,7 @@ REQUIRED = (
     ".github/prompts/sync-application.prompt.md",
     "contracts/application-contract.schema.json",
     "contracts/applications/dannellysolutions.yml",
+    "contracts/applications/recruiterreply.yml",
     "templates/verify.yml",
     "templates/promote.yml",
 )
