@@ -34,11 +34,14 @@ print("Factory templates validated")
 closure = (ROOT / "docs/ISSUE_CLOSURE.md").read_text()
 for marker in ("Dev-Completes:", "dev-acceptance-verified", "Test and Production", "read-only"):
     assert marker in closure, f"Missing closure policy: {marker}"
+for marker in ("optional product acceptance", "not a mandatory Dev gate", "retry signal"):
+    assert marker in closure, f"Missing Dev reconciliation policy: {marker}"
 
 schema = json.loads((ROOT / "contracts/application-contract.schema.json").read_text())
 for field in ("factory_repo", "application_repo", "application_name", "environments",
               "approval_label", "partial_marker", "final_marker", "implementation_overrides"):
     assert field in schema["required"], f"Missing contract field: {field}"
+assert "dev_reconciliation" in schema["required"]
 prompt = (ROOT / ".github/prompts/sync-application.prompt.md").read_text()
 for marker in ("implementation_overrides", "partial_marker", "final_marker", "machine-readable"):
     assert marker in prompt, f"Missing sync prompt requirement: {marker}"

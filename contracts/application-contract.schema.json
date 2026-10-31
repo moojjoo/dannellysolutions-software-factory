@@ -17,6 +17,7 @@
     "dev_workflow",
     "test_workflow",
     "prod_workflow",
+    "dev_reconciliation",
     "implementation_overrides"
   ],
   "properties": {
@@ -37,6 +38,16 @@
     "dev_workflow": {"type": "string", "minLength": 1},
     "test_workflow": {"type": "string", "minLength": 1},
     "prod_workflow": {"type": "string", "minLength": 1},
+    "dev_reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_required", "acceptance_label_required", "test_prod_approval_required"],
+      "properties": {
+        "evidence_required": {"type": "boolean", "const": true},
+        "acceptance_label_required": {"type": "boolean", "const": false},
+        "test_prod_approval_required": {"type": "boolean", "const": true}
+      }
+    },
     "implementation_overrides": {
       "type": "object",
       "additionalProperties": {"type": "string"}

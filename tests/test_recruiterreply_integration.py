@@ -32,8 +32,11 @@ class RecruiterReplyIntegrationTests(unittest.TestCase):
         for marker in ("Refs #123", "Dev-Completes: #123", "dev-acceptance-verified"):
             self.assertIn(marker, self.template)
         for marker in ("PROJECTS_WRITE_TOKEN", "DEV_DEPLOYMENT_VERIFIED", "merge_commit_sha === sha",
-                       "dev-acceptance-verified", "checksPass"):
+                       "checksPass", "findVerifiedDeploymentForIssue", "context.eventName === 'issues'"):
             self.assertIn(marker, self.reconciler)
+        self.assertNotIn("if (!issue.labels.some", self.reconciler)
+        self.assertIn("optional", self.template)
+        self.assertIn("not required for routine Dev completion", self.template)
 
     def test_read_only_audit_and_manual_release_gates_are_present(self):
         self.assertIn("workflow_dispatch:", self.audit_workflow)
@@ -51,6 +54,8 @@ class RecruiterReplyIntegrationTests(unittest.TestCase):
             "default_branch: main",
             "project_name: RecruiterReply MVP",
             "approval_label: dev-acceptance-verified",
+            "dev_reconciliation:",
+            "acceptance_label_required: false",
             "dev_workflow: .github/workflows/build.yml",
             "test_workflow: .github/workflows/promote-test.yml",
             "prod_workflow: .github/workflows/promote-prod.yml",
