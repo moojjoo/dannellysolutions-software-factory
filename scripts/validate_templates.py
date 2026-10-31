@@ -32,7 +32,7 @@ assert "deploy:" not in promotion, "Example must not deploy automatically"
 print("Factory templates validated")
 
 closure = (ROOT / "docs/ISSUE_CLOSURE.md").read_text()
-for marker in ("Dev-Completes:", "dev-acceptance-verified", "Test and Production", "read-only"):
+for marker in ("Dev-Completes:", "dev-acceptance-verified", "Test and Production", "read-only", "automatically"):
     assert marker in closure, f"Missing closure policy: {marker}"
 
 schema = json.loads((ROOT / "contracts/application-contract.schema.json").read_text())
