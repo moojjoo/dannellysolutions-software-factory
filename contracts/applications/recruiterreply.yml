@@ -8,11 +8,17 @@ environments:
   - test
   - prod
 approval_label: dev-acceptance-verified
+# Optional product-acceptance label. Verified Dev evidence, not this label, gates routine
+# reconciliation. Applying the label may retry reconciliation after a prior missed attempt.
 partial_marker: "Refs #<issue>"
 final_marker: "Dev-Completes: #<issue>"
 dev_workflow: .github/workflows/build.yml
 test_workflow: .github/workflows/promote-test.yml
 prod_workflow: .github/workflows/promote-prod.yml
+dev_reconciliation:
+  evidence_required: true
+  acceptance_label_required: false
+  test_prod_approval_required: true
 implementation_overrides:
   deployment_model: "AWS EC2 Docker Compose with immutable ECR images"
   application_tests: "Backend, frontend, Playwright, CodeQL and authenticated Dev smoke checks"

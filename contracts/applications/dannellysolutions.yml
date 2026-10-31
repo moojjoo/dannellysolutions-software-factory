@@ -8,11 +8,16 @@ environments:
   - test
   - prod
 approval_label: dev-acceptance-verified
+# Optional product-acceptance label; verified Dev evidence gates routine reconciliation.
 partial_marker: "Refs #<issue>"
 final_marker: "Dev-Completes: #<issue>"
 dev_workflow: .github/workflows/deploy-s3.yml
 test_workflow: .github/workflows/deploy-s3.yml
 prod_workflow: .github/workflows/deploy-s3.yml
+dev_reconciliation:
+  evidence_required: true
+  acceptance_label_required: false
+  test_prod_approval_required: true
 implementation_overrides:
   deployment_model: "S3 and CloudFront static website deployment"
   application_tests: "Static checks and deployment smoke tests"
