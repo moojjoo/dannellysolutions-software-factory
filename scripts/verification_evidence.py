@@ -152,52 +152,51 @@ class GitHubClient:
         return result.stdout
 
     def pr(self, repo: str, number: int) -> dict[str, Any]:
-        return json.loads(self._run(("gh", "api", f"repos/{repo}/pulls/{number}")))
-
-    def required_checks(self, repo: str, number: int) -> list[dict[str, Any]]:
         raw = self._run((
-            "gh", "pr", "checks", str(number), "-R", repo, "--required",
-            "--json", "name,state,link,bucket,workflow",
-        ), {0, 1, 8})
-        if not raw.strip():
-            return []
+            "gh", "pr", "view", str(number), "-R", repo,
+            "--json", "headRefOid,baseRefName,mergeStateStatus,statusCheckRollup,url",
+        ))
         try:
             return json.loads(raw)
         except json.JSONDecodeError as error:
-            raise EvidenceError(f"gh returned invalid required-check JSON: {error}") from error
+            raise EvidenceError(f"gh returned invalid PR evidence JSON: {error}") from error
 
 
 def collect_github_evidence(repo: str, pr_number: int, client: GitHubClient) -> dict[str, Any]:
     before = client.pr(repo, pr_number)
-    sha = before["head"]["sha"]
-    checks = client.required_checks(repo, pr_number)
+    sha = before["headRefOid"]
     after = client.pr(repo, pr_number)
-    after_sha = after["head"]["sha"]
+    after_sha = after["headRefOid"]
     if sha != after_sha:
         raise EvidenceError(f"PR head changed while collecting evidence: {sha} -> {after_sha}")
+    checks = before.get("statusCheckRollup") or []
     normalized = sorted(
         ({
-            "name": check.get("name"),
-            "state": check.get("state"),
-            "bucket": check.get("bucket"),
-            "workflow": check.get("workflow"),
-            "url": check.get("link"),
+            "name": check.get("name") or check.get("context"),
+            "state": check.get("conclusion") or check.get("state") or check.get("status"),
+            "workflow": check.get("workflowName"),
+            "url": check.get("detailsUrl") or check.get("targetUrl"),
         } for check in checks),
         key=lambda item: (item["name"] or "", item["url"] or ""),
     )
     states = {str(check["state"]).upper() for check in normalized}
+    merge_state = str(before.get("mergeStateStatus") or "UNKNOWN").upper()
+    checks_passed = bool(normalized) and states <= PASSING_CHECK_STATES
+    passed = checks_passed and merge_state == "CLEAN"
     return {
         "repository": repo,
         "pull_request": pr_number,
-        "pull_request_url": before["html_url"],
+        "pull_request_url": before["url"],
         "head_sha": sha,
         "head_stable": True,
+        "base_ref": before.get("baseRefName"),
+        "merge_state": merge_state,
         "required_checks": normalized,
-        "status": "passed" if normalized and states <= PASSING_CHECK_STATES else "blocked",
+        "status": "passed" if passed else "blocked",
         "diagnostic": (
-            "all required checks passed for the stable PR head"
-            if normalized and states <= PASSING_CHECK_STATES
-            else "required checks are missing, pending, or unsuccessful"
+            "all reported checks passed and GitHub reports the stable PR head mergeable"
+            if passed
+            else "checks are missing, pending, unsuccessful, or GitHub reports a merge blocker"
         ),
     }
 
@@ -218,18 +217,18 @@ def render_markdown(evidence: dict[str, Any]) -> str:
     github = evidence.get("github")
     if github:
         lines.extend([
-            "", "## Live GitHub required checks", "",
+            "", "## Live GitHub checks and merge state", "",
             f"PR: [{github['repository']}#{github['pull_request']}]({github['pull_request_url']})  ",
             f"Exact head: `{github['head_sha']}`  ",
             f"Status: **{github['status']}** — {github['diagnostic']}", "",
-            "| Required check | State | Link |",
+            "| Reported check | State | Link |",
             "| --- | --- | --- |",
         ])
         for check in github["required_checks"]:
             link = f"[details]({check['url']})" if check["url"] else ""
             lines.append(f"| {check['name']} | {check['state']} | {link} |")
     else:
-        lines.extend(["", "## Live GitHub required checks", "", "Not collected; local checks are not live acceptance."])
+        lines.extend(["", "## Live GitHub checks and merge state", "", "Not collected; local checks are not live acceptance."])
     return "\n".join(lines) + "\n"
 
 

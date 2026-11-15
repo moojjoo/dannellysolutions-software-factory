@@ -15,7 +15,6 @@ from scripts.verification_evidence import (
     render_markdown,
     run_commands,
     validate_linked_worktree,
-    GitHubClient,
 )
 
 
@@ -71,23 +70,33 @@ class VerificationEvidenceTests(unittest.TestCase):
             calls = 0
             def pr(self, repo, number):
                 self.calls += 1
-                return {"head": {"sha": "a" * 40}, "html_url": "https://example/pr/20"}
-            def required_checks(self, repo, number):
-                return [{"name": "test", "state": "SUCCESS", "link": "https://example/run", "bucket": "pass", "workflow": "CI"}]
+                return {
+                    "headRefOid": "a" * 40,
+                    "baseRefName": "main",
+                    "mergeStateStatus": "CLEAN",
+                    "url": "https://example/pr/20",
+                    "statusCheckRollup": [{"name": "test", "conclusion": "SUCCESS", "detailsUrl": "https://example/run", "workflowName": "CI"}],
+                }
 
         evidence = collect_github_evidence("owner/repo", 20, Client())
         self.assertEqual(evidence["status"], "passed")
         self.assertEqual(evidence["head_sha"], "a" * 40)
 
         class PendingClient(Client):
-            def required_checks(self, repo, number):
-                return [{"name": "test", "state": "PENDING", "link": None, "bucket": "pending", "workflow": "CI"}]
+            def pr(self, repo, number):
+                result = super().pr(repo, number)
+                result["mergeStateStatus"] = "UNSTABLE"
+                result["statusCheckRollup"][0]["conclusion"] = None
+                result["statusCheckRollup"][0]["status"] = "IN_PROGRESS"
+                return result
 
         self.assertEqual(collect_github_evidence("owner/repo", 20, PendingClient())["status"], "blocked")
 
         class EmptyClient(Client):
-            def required_checks(self, repo, number):
-                return []
+            def pr(self, repo, number):
+                result = super().pr(repo, number)
+                result["statusCheckRollup"] = []
+                return result
 
         self.assertEqual(collect_github_evidence("owner/repo", 20, EmptyClient())["status"], "blocked")
 
@@ -95,15 +104,10 @@ class VerificationEvidenceTests(unittest.TestCase):
             def pr(self, repo, number):
                 self.calls += 1
                 sha = ("a" if self.calls == 1 else "b") * 40
-                return {"head": {"sha": sha}, "html_url": "https://example/pr/20"}
+                return {"headRefOid": sha, "url": "https://example/pr/20", "statusCheckRollup": []}
 
         with self.assertRaisesRegex(EvidenceError, "head changed"):
             collect_github_evidence("owner/repo", 20, MovingClient())
-
-    def test_empty_required_check_output_is_blocked_not_a_json_crash(self):
-        client = GitHubClient()
-        with mock.patch.object(client, "_run", return_value=""):
-            self.assertEqual(client.required_checks("owner/repo", 20), [])
 
     def test_markdown_separates_local_from_live_evidence(self):
         evidence = {
