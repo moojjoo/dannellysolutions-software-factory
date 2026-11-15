@@ -169,7 +169,9 @@ def collect_github_evidence(repo: str, pr_number: int, client: GitHubClient) -> 
     after_sha = after["headRefOid"]
     if sha != after_sha:
         raise EvidenceError(f"PR head changed while collecting evidence: {sha} -> {after_sha}")
-    checks = before.get("statusCheckRollup") or []
+    # Use the second snapshot so conclusions and mergeability are the freshest
+    # state observed after confirming that the PR head did not move.
+    checks = after.get("statusCheckRollup") or []
     normalized = sorted(
         ({
             "name": check.get("name") or check.get("context"),
@@ -180,16 +182,16 @@ def collect_github_evidence(repo: str, pr_number: int, client: GitHubClient) -> 
         key=lambda item: (item["name"] or "", item["url"] or ""),
     )
     states = {str(check["state"]).upper() for check in normalized}
-    merge_state = str(before.get("mergeStateStatus") or "UNKNOWN").upper()
+    merge_state = str(after.get("mergeStateStatus") or "UNKNOWN").upper()
     checks_passed = bool(normalized) and states <= PASSING_CHECK_STATES
     passed = checks_passed and merge_state == "CLEAN"
     return {
         "repository": repo,
         "pull_request": pr_number,
-        "pull_request_url": before["url"],
+        "pull_request_url": after["url"],
         "head_sha": sha,
         "head_stable": True,
-        "base_ref": before.get("baseRefName"),
+        "base_ref": after.get("baseRefName"),
         "merge_state": merge_state,
         "required_checks": normalized,
         "status": "passed" if passed else "blocked",
