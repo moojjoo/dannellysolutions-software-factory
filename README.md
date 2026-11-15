@@ -30,6 +30,8 @@ Idea → /feature → GitHub Issue
 
 The **application repository** owns its actual build, tests, secrets, deployments, and promotion workflows. This factory supplies shared policy and starter templates.
 
+Application contracts also declare a short `pr_title_prefix`. Human-authored PR titles use `<prefix>-<linked-issue>: <summary>` with no zero padding, such as `DS-16: Standardize Dev reconciliation` or `RR-544: Optimize RecruiterReply pricing`. This title convention is independent of Conventional Commit messages. PR bodies must retain `Refs #<issue>` or the application's final-completion marker so existing issue extraction and reconciliation remain authoritative.
+
 ## Command reference
 
 | Command | Expected behavior | Approval boundary |
