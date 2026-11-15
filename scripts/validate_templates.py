@@ -50,5 +50,6 @@ for contract, prefix in (("dannellysolutions.yml", "DS"), ("recruiterreply.yml",
     text = (ROOT / "contracts" / "applications" / contract).read_text()
     assert f"pr_title_prefix: {prefix}" in text, f"Missing PR title prefix: {prefix}"
 
-for marker in ("<prefix>-<issue>: <summary>", "Do not pad issue numbers", "Refs #<issue>"):
+for marker in ("<prefix>-<issue>: <summary>", "<type>(<prefix>-<issue>): <subject>",
+               "docs(DS-18): document PR title policy", "Do not pad issue numbers", "Refs #<issue>"):
     assert marker in workflow, f"Missing PR title policy: {marker}"

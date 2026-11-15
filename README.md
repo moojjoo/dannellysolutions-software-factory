@@ -32,6 +32,8 @@ The **application repository** owns its actual build, tests, secrets, deployment
 
 Application contracts also declare a short `pr_title_prefix`. Human-authored PR titles use `<prefix>-<linked-issue>: <summary>` with no zero padding, such as `DS-16: Standardize Dev reconciliation` or `RR-544: Optimize RecruiterReply pricing`. This title convention is independent of Conventional Commit messages. PR bodies must retain `Refs #<issue>` or the application's final-completion marker so existing issue extraction and reconciliation remain authoritative.
 
+Commits remain Conventional Commits and carry the same traceability in the scope: `<type>(<prefix>-<issue>): <subject>`, for example `docs(DS-18): document PR title policy`. This preserves Conventional Commit parsing while making the linked repository issue visible in history.
+
 ## Command reference
 
 | Command | Expected behavior | Approval boundary |

@@ -8,7 +8,7 @@ Inspect the application repository, identify existing related issues, create an 
 
 1. Read `AGENTS.md`, current architecture, existing workflows, and issue requirements.
 2. Create `feature/<issue>-<slug>` from the latest `main`.
-3. Make focused changes and add tests. Never commit secrets.
+3. Make focused changes and add tests. Never commit secrets. Use Conventional Commits with the repository issue identifier as the scope: `<type>(<prefix>-<issue>): <subject>` (for example, `docs(DS-18): document PR title policy`). The type remains one of the repository's supported Conventional Commit types, the issue number is not zero-padded, and the subject remains imperative.
 4. Open a **non-draft** PR linked to the issue. Title it `<prefix>-<issue>: <summary>`, using the application contract's `pr_title_prefix` and the linked repository issue number (for example, `DS-16: Document pull request titles`). Do not pad issue numbers. Keep `Refs #<issue>` or the approved final-completion marker in the PR body; the title is not a replacement for issue linking. No mandatory Copilot reviewer for a solo-developer account.
 5. Run all required build, unit, Playwright, CodeQL, and secret checks. Repair failures on the branch; never bypass a red check.
 6. Enable GitHub auto-merge where supported; the GitHub platform merges only when required checks and branch rules pass. If not supported, leave the PR open and report the blocker.
