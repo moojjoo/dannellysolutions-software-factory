@@ -51,6 +51,7 @@ The **application repository** owns its actual build, tests, secrets, deployment
 | [`templates/verify.yml`](templates/verify.yml) | Example PR verification workflow; replace placeholder build/test steps |
 | [`templates/promote.yml`](templates/promote.yml) | Example manual SHA input validation; intentionally **does not deploy** |
 | [`scripts/validate_templates.py`](scripts/validate_templates.py) | Dependency-free structural validator |
+| [`scripts/verification_evidence.py`](scripts/verification_evidence.py) | Bounded parallel local checks plus exact-PR-head evidence |
 | [`.github/workflows/validate.yml`](.github/workflows/validate.yml) | GitHub Actions workflow validating factory templates |
 
 ## Quick start
@@ -62,6 +63,28 @@ git clone https://github.com/moojjoo/dannellysolutions-software-factory.git
 cd dannellysolutions-software-factory
 python3 scripts/validate_templates.py
 ```
+
+### Fast, fail-closed verification evidence
+
+Run explicitly selected independent checks from a clean registered linked worktree.
+The runner reuses installed WSL tools and caches; it never installs dependencies or
+creates credentials. Local commands run concurrently with bounded timeouts, while
+optional GitHub evidence is resolved through the authenticated `gh` CLI and checked
+against a stable pull-request head SHA.
+
+```bash
+python3 scripts/verification_evidence.py \
+  --command 'focused=python3 -m unittest tests.test_verification_evidence' \
+  --command 'templates=python3 scripts/validate_templates.py' \
+  --jobs 2 --timeout 300 \
+  --repo moojjoo/dannellysolutions-software-factory --pr 20
+```
+
+The command emits deterministic `verification-evidence.json` and
+`verification-evidence.md` files. A dirty or primary checkout, missing/pending/failed
+required check, changing PR head, timeout, missing tool, or local failure blocks the
+result. Local verification is always labelled as local-only and never substitutes
+for required GitHub checks, approval gates, or live environment acceptance.
 
 ### 2. Configure an application repository
 
