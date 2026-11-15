@@ -15,6 +15,7 @@ from scripts.verification_evidence import (
     render_markdown,
     run_commands,
     validate_linked_worktree,
+    GitHubClient,
 )
 
 
@@ -98,6 +99,11 @@ class VerificationEvidenceTests(unittest.TestCase):
 
         with self.assertRaisesRegex(EvidenceError, "head changed"):
             collect_github_evidence("owner/repo", 20, MovingClient())
+
+    def test_empty_required_check_output_is_blocked_not_a_json_crash(self):
+        client = GitHubClient()
+        with mock.patch.object(client, "_run", return_value=""):
+            self.assertEqual(client.required_checks("owner/repo", 20), [])
 
     def test_markdown_separates_local_from_live_evidence(self):
         evidence = {

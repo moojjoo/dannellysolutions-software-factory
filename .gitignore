@@ -1,0 +1,4 @@
+__pycache__/
+*.py[cod]
+verification-evidence.json
+verification-evidence.md

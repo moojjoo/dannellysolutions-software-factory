@@ -159,7 +159,12 @@ class GitHubClient:
             "gh", "pr", "checks", str(number), "-R", repo, "--required",
             "--json", "name,state,link,bucket,workflow",
         ), {0, 1, 8})
-        return json.loads(raw)
+        if not raw.strip():
+            return []
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError as error:
+            raise EvidenceError(f"gh returned invalid required-check JSON: {error}") from error
 
 
 def collect_github_evidence(repo: str, pr_number: int, client: GitHubClient) -> dict[str, Any]:
