@@ -8,6 +8,7 @@
     "factory_repo",
     "application_repo",
     "application_name",
+    "pr_title_prefix",
     "default_branch",
     "project_name",
     "environments",
@@ -24,6 +25,7 @@
     "factory_repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
     "application_repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
     "application_name": {"type": "string", "minLength": 1},
+    "pr_title_prefix": {"type": "string", "pattern": "^[A-Z]{2,10}$"},
     "default_branch": {"type": "string", "minLength": 1},
     "project_name": {"type": "string", "minLength": 1},
     "environments": {
