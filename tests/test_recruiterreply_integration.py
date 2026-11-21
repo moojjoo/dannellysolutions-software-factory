@@ -32,7 +32,7 @@ class RecruiterReplyIntegrationTests(unittest.TestCase):
         for marker in ("Refs #123", "Dev-Completes: #123", "dev-acceptance-verified"):
             self.assertIn(marker, self.template)
         for marker in ("PROJECTS_WRITE_TOKEN", "DEV_DEPLOYMENT_VERIFIED", "merge_commit_sha === sha",
-                       "dev-acceptance-verified", "checksPass"):
+                       "checksPass", "findVerifiedDeploymentForIssue", "context.eventName === 'issues'"):
             self.assertIn(marker, self.reconciler)
         # The application PR may land after this factory contract. When the
         # newer reconciler is present, verify its optional-label retry hook;
@@ -58,6 +58,8 @@ class RecruiterReplyIntegrationTests(unittest.TestCase):
             "default_branch: main",
             "project_name: RecruiterReply MVP",
             "approval_label: dev-acceptance-verified",
+            "dev_reconciliation:",
+            "acceptance_label_required: false",
             "dev_workflow: .github/workflows/build.yml",
             "test_workflow: .github/workflows/promote-test.yml",
             "prod_workflow: .github/workflows/promote-prod.yml",

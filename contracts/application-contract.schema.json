@@ -8,6 +8,7 @@
     "factory_repo",
     "application_repo",
     "application_name",
+    "pr_title_prefix",
     "default_branch",
     "project_name",
     "environments",
@@ -17,12 +18,14 @@
     "dev_workflow",
     "test_workflow",
     "prod_workflow",
+    "dev_reconciliation",
     "implementation_overrides"
   ],
   "properties": {
     "factory_repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
     "application_repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
     "application_name": {"type": "string", "minLength": 1},
+    "pr_title_prefix": {"type": "string", "pattern": "^[A-Z]{2,10}$"},
     "default_branch": {"type": "string", "minLength": 1},
     "project_name": {"type": "string", "minLength": 1},
     "environments": {
@@ -37,6 +40,16 @@
     "dev_workflow": {"type": "string", "minLength": 1},
     "test_workflow": {"type": "string", "minLength": 1},
     "prod_workflow": {"type": "string", "minLength": 1},
+    "dev_reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_required", "acceptance_label_required", "test_prod_approval_required"],
+      "properties": {
+        "evidence_required": {"type": "boolean", "const": true},
+        "acceptance_label_required": {"type": "boolean", "const": false},
+        "test_prod_approval_required": {"type": "boolean", "const": true}
+      }
+    },
     "implementation_overrides": {
       "type": "object",
       "additionalProperties": {"type": "string"}
