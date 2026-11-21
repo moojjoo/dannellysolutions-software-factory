@@ -32,7 +32,7 @@ assert "deploy:" not in promotion, "Example must not deploy automatically"
 print("Factory templates validated")
 
 closure = (ROOT / "docs/ISSUE_CLOSURE.md").read_text()
-for marker in ("Dev-Completes:", "dev-acceptance-verified", "Test and Production", "read-only"):
+for marker in ("Dev-Completes:", "dev-acceptance-verified", "Test and Production", "read-only", "automatically"):
     assert marker in closure, f"Missing closure policy: {marker}"
 for marker in ("optional product acceptance", "not a mandatory Dev gate", "retry signal"):
     assert marker in closure, f"Missing Dev reconciliation policy: {marker}"

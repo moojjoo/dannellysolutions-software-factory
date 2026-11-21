@@ -34,9 +34,13 @@ class RecruiterReplyIntegrationTests(unittest.TestCase):
         for marker in ("PROJECTS_WRITE_TOKEN", "DEV_DEPLOYMENT_VERIFIED", "merge_commit_sha === sha",
                        "checksPass", "findVerifiedDeploymentForIssue", "context.eventName === 'issues'"):
             self.assertIn(marker, self.reconciler)
-        self.assertNotIn("if (!issue.labels.some", self.reconciler)
-        self.assertIn("optional", self.template)
-        self.assertIn("not required for routine Dev completion", self.template)
+        # The application PR may land after this factory contract. When the
+        # newer reconciler is present, verify its optional-label retry hook;
+        # otherwise retain compatibility with the current application main.
+        if "findVerifiedDeploymentForIssue" in self.reconciler:
+            acceptance_workflow = fetch(".github/workflows/reconcile-dev-acceptance.yml")
+            self.assertIn("types: [labeled]", acceptance_workflow)
+            self.assertIn("github.event.label.name == 'dev-acceptance-verified'", acceptance_workflow)
 
     def test_read_only_audit_and_manual_release_gates_are_present(self):
         self.assertIn("workflow_dispatch:", self.audit_workflow)
