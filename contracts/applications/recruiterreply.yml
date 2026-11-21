@@ -1,6 +1,7 @@
 factory_repo: moojjoo/dannellysolutions-software-factory
 application_repo: moojjoo/recruiterreply
 application_name: RecruiterReply
+pr_title_prefix: RR
 default_branch: main
 project_name: RecruiterReply MVP
 environments:
